@@ -1,134 +1,131 @@
-// frontend/src/components/BookingModal.jsx
-import React, { useEffect, useState } from 'react';
-import PriceBreakdown from './PriceBreakdown';
-import './BookingModal.css';
+import React, { useEffect, useState } from "react";
+import "./BookingModal.css";
 
 export default function BookingModal({
   court,
   slot,
-  equipmentOptions = [],
-  coaches = [],
+  equipmentOptions,
+  coaches,
   onClose,
   previewPrice,
-  createBooking
+  createBooking,
 }) {
   const [selectedEquipment, setSelectedEquipment] = useState([]);
-  const [coachId, setCoachId] = useState('');
+  const [coachId, setCoachId] = useState("");
   const [pricing, setPricing] = useState(null);
-  const [loadingPrice, setLoadingPrice] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   function toggleEquipment(eq) {
-    const exists = selectedEquipment.find(e => e.equipmentId === eq._id);
+    const exists = selectedEquipment.find(
+      (e) => e.equipmentId === eq._id
+    );
+
     if (exists) {
-      setSelectedEquipment(selectedEquipment.filter(e => e.equipmentId !== eq._id));
+      setSelectedEquipment(
+        selectedEquipment.filter((e) => e.equipmentId !== eq._id)
+      );
     } else {
-      setSelectedEquipment([...selectedEquipment, { equipmentId: eq._id, quantity: 1 }]);
+      setSelectedEquipment([
+        ...selectedEquipment,
+        { equipmentId: eq._id, quantity: 1 },
+      ]);
     }
+  }
+
+  function buildPayload() {
+    return {
+      courtId: court._id,
+      startTime: new Date(slot.start).toISOString(),
+      endTime: new Date(slot.end).toISOString(),
+      equipment: selectedEquipment,
+      coachId: coachId || null,
+    };
   }
 
   useEffect(() => {
-    async function load() {
-      if (!slot || !court) return;
-      setLoadingPrice(true);
-      const payload = {
-        courtId: court._id,
-        startTime: slot.start,
-        endTime: slot.end,
-        equipment: selectedEquipment,
-        coachId: coachId || null
-      };
-      console.log('Preview payload:', payload);
+    async function loadPrice() {
       try {
-        const res = await previewPrice(payload);
-        if (res && res.data && typeof res.data.total === 'number') {
-          setPricing(res.data);
-        } else {
-          console.warn('Invalid preview response', res);
-          setPricing(null);
-        }
+        const res = await previewPrice(buildPayload());
+        setPricing(res.data);
       } catch (err) {
-        console.error('Preview price error:', err);
-        setPricing(null);
-      } finally {
-        setLoadingPrice(false);
+        console.error("Preview price error", err);
       }
     }
-    load();
-  }, [selectedEquipment, coachId, court, slot, previewPrice]);
+    loadPrice();
+  }, [selectedEquipment, coachId, court, slot]);
 
   async function handleConfirm() {
-    try {
-      setSubmitting(true);
-      const payload = {
-        courtId: court._id,
-        startTime: slot.start,
-        endTime: slot.end,
-        equipment: selectedEquipment,
-        coachId: coachId || null,
-        userId: null
-      };
-      console.log('Create booking payload:', payload);
-      const res = await createBooking(payload);
-      if (res && res.data && res.data.booking) {
-        alert('Booking confirmed');
-        onClose();
-      } else {
-        console.error('Unexpected response from server:', res);
-        alert('Booking failed: No booking data returned.');
-      }
-    } catch (err) {
-      console.error('Booking error:', err);
-      const msg = err?.response?.data?.error || err?.message || 'Server not reachable';
-      alert('Booking failed: ' + msg);
-    } finally {
-      setSubmitting(false);
+  try {
+    setSubmitting(true);
+
+    await createBooking(buildPayload());
+
+    alert("Booking Confirmed ✅");
+    onClose();
+
+  } catch (err) {
+    if (err.response && err.response.status === 409) {
+      alert("This slot is already booked. Please select another slot.");
+    } else {
+      alert("Booking failed. Please try again.");
     }
+  } finally {
+    setSubmitting(false);
   }
+  }
+
 
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h3 className="modal-title">Book {court?.name}</h3>
-        <p className="modal-slot">
-          {new Date(slot.start).toLocaleString()} - {new Date(slot.end).toLocaleTimeString()}
+        <h3 className="book-heading">Book {court.name}</h3>
+
+        <p>
+          {new Date(slot.start).toLocaleTimeString()} -{" "}
+          {new Date(slot.end).toLocaleTimeString()}
         </p>
 
-        <div className="section equipment-section">
-          <h4 className="section-title">Equipment</h4>
-          <div className="equipment-list">
-            {equipmentOptions.map(eq => {
-              const checked = selectedEquipment.some(e => e.equipmentId === eq._id);
-              return (
-                <label key={eq._id} className="equipment-item">
-                  <input type="checkbox" checked={checked} onChange={() => toggleEquipment(eq)} />
-                  {eq.name} (+{eq.rentalPrice})
-                </label>
-              );
-            })}
-          </div>
-        </div>
+        <h4 className="equipment-head">Equipment</h4>
+        {equipmentOptions.map((eq) => (
+          <label key={eq._id} className="checkbox">
+            <input
+              type="checkbox"
+              checked={selectedEquipment.some(
+                (e) => e.equipmentId === eq._id
+              )}
+              onChange={() => toggleEquipment(eq)}
+            />
+            {eq.name} (+₹{eq.rentalPrice})
+          </label>
+        ))}
 
-        <div className="section coach-section">
-          <h4 className="section-title">Coach (optional)</h4>
-          <select value={coachId} onChange={e => setCoachId(e.target.value)} className="coach-select">
-            <option value="">No coach</option>
-            {coaches.map(c => (
-              <option key={c._id} value={c._id}>{c.name} (+{c.hourlyRate}/hr)</option>
-            ))}
-          </select>
-        </div>
+        <h4 className="coach-head">Coach</h4>
+        <select
+          value={coachId}
+          onChange={(e) => setCoachId(e.target.value)}
+        >
+          <option value="">No Coach</option>
+          {coaches.map((c) => (
+            <option key={c._id} value={c._id}>
+              {c.name} (+₹{c.hourlyRate}/hr)
+            </option>
+          ))}
+        </select>
 
-        <div className="section price-section">
-          <h4 className="section-title">Price</h4>
-          {loadingPrice ? <div className="loading-text">Calculating...</div>
-            : pricing ? <PriceBreakdown pricing={pricing} /> : <div className="loading-text">Price not available</div>}
-        </div>
+        <h4 className="prices-head">Price</h4>
+        {pricing && (
+          <>
+            <p className="base-price">Base: ₹{pricing.basePrice}</p>
+            <p className="base-price">Equipment: ₹{pricing.equipmentFee}</p>
+            <p className="base-price">Coach: ₹{pricing.coachFee}</p>
+            <p className="total-price"><strong>Total: ₹{pricing.total}</strong></p>
+          </>
+        )}
 
         <div className="modal-actions">
-          <button className="btn btn-cancel" onClick={onClose} disabled={submitting}>Cancel</button>
-          <button className="btn btn-confirm" onClick={handleConfirm} disabled={submitting}>
-            {submitting ? 'Booking…' : 'Confirm Booking'}
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="booking-btn" onClick={handleConfirm} disabled={submitting}>
+            {submitting ? "Booking..." : "Confirm Booking"}
           </button>
         </div>
       </div>

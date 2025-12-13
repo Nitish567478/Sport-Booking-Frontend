@@ -1,10 +1,8 @@
-import React from 'react';
-import { buildTodaySlotRange } from '../utils/dateUtils';
-
-import './SlotGrid.css';
+import React from "react";
+import { buildTodaySlotRange } from "../utils/dateUtils";
+import "./SlotGrid.css";
 
 export default function SlotGrid({ court, onSlotClick }) {
-  // slots = [{ start: Date, end: Date, label: string }]
   const slots = buildTodaySlotRange(8, 22);
 
   return (
@@ -13,7 +11,7 @@ export default function SlotGrid({ court, onSlotClick }) {
         <button
           key={slot.start.toISOString()}
           className="slot-button"
-          onClick={() => onSlotClick(slot)}  // ✅ pass full slot object
+          onClick={() => onSlotClick(slot)}
         >
           {slot.label}
         </button>

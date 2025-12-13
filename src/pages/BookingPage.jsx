@@ -1,24 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import SlotGrid from '../components/SlotGrid';
-import BookingModal from '../components/BookingModal';
-import Spinner from '../components/Spinner';
+import React, { useEffect, useState } from "react";
+import SlotGrid from "../components/SlotGrid";
+import BookingModal from "../components/BookingModal";
 
 import './BookingPage.css';
-// Demo data to replace API calls
-const demoCourts = [
-  { _id: 'court1', name: 'Court A', type: 'Indoor', basePrice: 20 },
-  { _id: 'court2', name: 'Court B', type: 'Outdoor', basePrice: 15 },
-];
 
-const demoEquipment = [
-  { _id: 'equip1', name: 'Rackets', price: 5 },
-  { _id: 'equip2', name: 'Balls', price: 3 },
-];
-
-const demoCoaches = [
-  { _id: 'coach1', name: 'Coach John', pricePerHour: 30 },
-  { _id: 'coach2', name: 'Coach Mary', pricePerHour: 25 },
-];
+import {
+  getCourts,
+  getEquipment,
+  getCoaches,
+  previewPrice,
+  createBooking,
+} from "../api/api";
 
 export default function BookingPage() {
   const [courts, setCourts] = useState([]);
@@ -26,57 +18,55 @@ export default function BookingPage() {
   const [coaches, setCoaches] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [selectedCourt, setSelectedCourt] = useState(null);
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [activeCourt, setActiveCourt] = useState(null);
+  const [activeSlot, setActiveSlot] = useState(null);
 
   useEffect(() => {
-    // Simulate loading delay
-    setTimeout(() => {
-      setCourts(demoCourts);
-      setEquipment(demoEquipment);
-      setCoaches(demoCoaches);
+    async function load() {
+      const [c, e, co] = await Promise.all([
+        getCourts(),
+        getEquipment(),
+        getCoaches(),
+      ]);
+      setCourts(c.data);
+      setEquipment(e.data);
+      setCoaches(co.data);
       setLoading(false);
-    }, 500);
+    }
+    load();
   }, []);
 
-  function onSlotClick(court, start, end) {
-    setSelectedCourt(court);
-    setSelectedSlot({ start, end });
-    setModalOpen(true);
-  }
-
-  if (loading) return <Spinner />;
+  if (loading) return <h3>Loading...</h3>;
 
   return (
-    <div className="booking-page">
-      <h2 className="heading">Book a Court</h2>
-      <p className="paragraph">Select a court and time slot for today.</p>
+    <div>
+      <h2 className="booking-heading">Book a Court</h2>
 
-      <div className="court-grid">
-        {courts.map(court => (
-          <div key={court._id} className="court-card">
-            <h3 className="court-card__title">
-              {court.name} <span className="court-card__subtitle">({court.type})</span>
-            </h3>
-            <p className="court-card__price">Base price: ${court.basePrice}</p>
-            <SlotGrid
-              court={court}
-              onSlotClick={(start, end) => onSlotClick(court, start, end)}
-            />
-          </div>
-        ))}
-      </div>
+      {courts.map((court) => (
+        <div key={court._id}>
+          <h3 className="court-name">{court.name} ({court.type})</h3>
+          <SlotGrid
+            court={court}
+            onSlotClick={(slot) => {
+              setActiveCourt(court);
+              setActiveSlot(slot);
+            }}
+          />
+        </div>
+      ))}
 
-      {modalOpen && selectedCourt && selectedSlot && (
+      {activeCourt && activeSlot && (
         <BookingModal
-          court={selectedCourt}
-          slot={selectedSlot}
+          court={activeCourt}
+          slot={activeSlot}
           equipmentOptions={equipment}
           coaches={coaches}
-          onClose={() => setModalOpen(false)}
-          previewPrice={() => {}}
-          createBooking={() => {}}
+          onClose={() => {
+            setActiveCourt(null);
+            setActiveSlot(null);
+          }}
+          previewPrice={previewPrice}
+          createBooking={createBooking}
         />
       )}
     </div>

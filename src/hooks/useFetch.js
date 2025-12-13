@@ -19,7 +19,7 @@ export default function useFetch(fetchFn, deps = []) {
     }
     load();
     return () => { mounted = false; };
-  }, deps); // eslint-disable-line react-hooks/exhaustive-deps
+  }, deps); 
 
   return { data, loading };
 }

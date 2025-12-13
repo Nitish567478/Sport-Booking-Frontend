@@ -1,201 +1,39 @@
-body{
-    background-color: hsl(221, 55%, 82%);
-}
-
-.booking-page {
-  width: 1100px;
-  margin: 0 auto;
-  padding: 32px 20px;
-  font-family: Arial, sans-serif;
-}
-
-.heading {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #341ddf;
-  margin-bottom: 12px;
-}
-
-.paragraph {
-  font-size: 1rem;
-  color: #3c3b3b;
-  margin-bottom: 28px;
-}
-
-.court-grid {
-  display: grid;
-  gap: 24px;
-  margin-bottom: 20px;
-  /* grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); */
-}
-
-.court-card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.court-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-
-.court-card__title {
-  font-size: 1.5rem;
+.booking-heading {
+  font-size: 1.6rem;
   font-weight: 600;
-  color: #384eca;
-  margin-bottom: 4px;
+  margin-bottom: 20px;
+  color: #1e293b;
 }
 
-.court-card__subtitle {
-  font-size: 0.9rem;
-  color: #8d7676;
+.court-name {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 20px 0 10px;
+  color: #334155;
 }
 
-.court-card__price {
-  font-size: 1.09rem;
-  margin-top: 10px;
-  color: #3cd920;
-  font-weight: 700;
-}
+@media (max-width: 768px) {
+  .booking-heading {
+    font-size: 1.3rem;
+  }
 
-.slot-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.slot-button {
-  background: #2563eb;
-  color: #fff;
-  padding: 10px 0;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.slot-button:hover {
-  background: #1d4ed8;
-}
-
-.spinner {
-  display: flex;
-  justify-content: center;
-  margin-top: 60px;
-}
-
-.spinner div {
-  width: 14px;
-  height: 14px;
-  margin: 6px;
-  border-radius: 50%;
-  background: #2563eb;
-  animation: bounce 0.6s infinite alternate;
-}
-
-.spinner div:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.spinner div:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-@keyframes bounce {
-  to {
-    transform: translateY(-10px);
-    opacity: 0.5;
+  .court-name {
+    font-size: 1.05rem;
   }
 }
-
-.booking-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+.booking-form {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+  flex-direction: column;
+  gap: 15px;
 }
-
-.booking-modal__content {
-  background: #fff;
-  width: 420px;
-  padding: 28px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-}
-
-.booking-modal__title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 18px;
-  color: #222;
-}
-
-.booking-modal__option {
-  margin-bottom: 14px;
-}
-
-.booking-modal__option select,
-.booking-modal__option input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+.booking-form label {
   font-size: 1rem;
-  outline: none;
-  transition: border 0.2s ease;
+  color: #475569;
 }
-
-.booking-modal__option select:focus,
-.booking-modal__option input:focus {
-  border-color: #2563eb;
+.booking-form input,
+.booking-form select {
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  font-size: 1rem;
 }
-
-.booking-modal__close-btn {
-  background: #ef4444;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  margin-top: 10px;
-  transition: background 0.2s ease;
-}
-
-.booking-modal__close-btn:hover {
-  background: #dc2626;
-}
-
-.booking-modal__create-btn {
-  background: #2563eb;
-  color: white;
-  padding: 12px;
-  border: none;
-  width: 100%;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-top: 20px;
-  transition: background 0.2s ease;
-}
-
-.booking-modal__create-btn:hover {
-  background: #1d4ed8;
-}
-.booking-modal__actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-}
-

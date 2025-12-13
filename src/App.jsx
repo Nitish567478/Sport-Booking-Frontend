@@ -1,5 +1,6 @@
-// App.jsx
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+
 import BookingPage from './pages/BookingPage';
 import AdminDashboard from './pages/AdminDashboard';
 import BookingHistory from './pages/BookingHistory';
@@ -7,39 +8,51 @@ import BookingHistory from './pages/BookingHistory';
 import './App.css';
 
 export default function App() {
-  const [view, setView] = React.useState('booking');
-
   return (
-    <div className="app-container">
-      <header className="header">
-        <h1 className="header-title">Booking Platform</h1>
-        <nav className="nav-menu">
-          <button
-            className={`nav-button ${view === 'booking' ? 'active' : ''}`}
-            onClick={() => setView('booking')}
-          >
-            Book
-          </button>
-          <button
-            className={`nav-button ${view === 'history' ? 'active' : ''}`}
-            onClick={() => setView('history')}
-          >
-            History
-          </button>
-          <button
-            className={`nav-button ${view === 'admin' ? 'active' : ''}`}
-            onClick={() => setView('admin')}
-          >
-            Admin
-          </button>
-        </nav>
-      </header>
+    <Router>
+      <div className="app-container">
+        <header className="header">
+          <h1 className="header-title">Booking Platform</h1>
 
-      <main className="main-content">
-        {view === 'booking' && <BookingPage />}
-        {view === 'history' && <BookingHistory />}
-        {view === 'admin' && <AdminDashboard />}
-      </main>
-    </div>
+          <nav className="nav-menu">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `nav-button ${isActive ? 'active' : ''}`
+              }
+            >
+              Book
+            </NavLink>
+
+            <NavLink
+              to="/history"
+              className={({ isActive }) =>
+                `nav-button ${isActive ? 'active' : ''}`
+              }
+            >
+              History
+            </NavLink>
+
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `nav-button ${isActive ? 'active' : ''}`
+              }
+            >
+              Admin
+            </NavLink>
+          </nav>
+        </header>
+
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<BookingPage />} />
+            <Route path="/history" element={<BookingHistory />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
